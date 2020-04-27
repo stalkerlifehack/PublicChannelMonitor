@@ -32,7 +32,7 @@ if [ "$1" == "start" ];
         sleep 0.3
         if screen -ls | grep -q public_admin;
         then
-          sleep 0.00001
+          sleep 0.00001 
         else
            redMessage "   - bot was not started! Check the config file!"
         fi
