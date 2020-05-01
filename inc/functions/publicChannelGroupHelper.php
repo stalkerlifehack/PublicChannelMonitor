@@ -30,10 +30,19 @@ class publicChannelGroupHelper
                 asort($data[$client['cfid']]);
 
                 foreach(array_keys($data[$client['cfid']]) as $newUser){
-                    if(array_key_exists($newUser, $allUsers)){  
-                        $ts->setClientChannelGroup($config['channelAdminGroup'], $client['cfid'], $newUser);
-                        $ts->sendMessage(1, $allUsers[$newUser], $lang['msg1']);
+                    $channelClient = $ts->channelGroupClientList($lastChannel, null, $config['channelAdminGroup'])['data'];
+                    if(isset($channelClient) && !empty($channelClient)){
+                        foreach($channelClient as $cl){
+                            $all[] = $cl['cldbid'];
+                        }
+                        if(array_key_exists($newUser, $allUsers)){  
+                            if(!in_array($newUser, $all)){
+                                $ts->setClientChannelGroup($config['channelAdminGroup'], $client['cfid'], $newUser);
+                                $ts->sendMessage(1, $allUsers[$newUser], $lang['msg1']);
+                                
+                            }
                         break;
+                        }
                     }
                 }
             }
