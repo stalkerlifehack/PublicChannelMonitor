@@ -16,9 +16,9 @@ class publicChannelGroupHelper
         
         if(in_array($ts->channelInfo($client['cfid'])['data']['pid'], $config['publicParentChannels'])){
             $data = json_decode(file_get_contents('cache/saveClientChannel.json'), true);
-            $ts->setClientChannelGroup($config['defaultChannelGroup'], $client['cfid'], $cldbid);
             unset($data[$client['cfid']][$cldbid]);
             file_put_contents('cache/saveClientChannel.json', json_encode($data));
+            $ts->setClientChannelGroup($config['defaultChannelGroup'], $client['cfid'], $cldbid);
 
 
             $channelList = $ts->channelClientList($client['cfid'])['data'];
@@ -30,19 +30,12 @@ class publicChannelGroupHelper
                 asort($data[$client['cfid']]);
 
                 foreach(array_keys($data[$client['cfid']]) as $newUser){
-                    $channelClient = $ts->channelGroupClientList($lastChannel, null, $config['channelAdminGroup'])['data'];
-                    if(isset($channelClient) && !empty($channelClient)){
-                        foreach($channelClient as $cl){
-                            $all[] = $cl['cldbid'];
+                    if(array_key_exists($newUser, $allUsers)){  
+                        if(!$ts->channelGroupClientList($client['cfid'], $newUser, $config['channelAdminGroup'])['success']){
+                            $ts->setClientChannelGroup($config['channelAdminGroup'], $client['cfid'], $newUser);
+                            $ts->sendMessage(1, $allUsers[$newUser], $lang['msg1']);
                         }
-                        if(array_key_exists($newUser, $allUsers)){  
-                            if(!in_array($newUser, $all)){
-                                $ts->setClientChannelGroup($config['channelAdminGroup'], $client['cfid'], $newUser);
-                                $ts->sendMessage(1, $allUsers[$newUser], $lang['msg1']);
-                                
-                            }
                         break;
-                        }
                     }
                 }
             }

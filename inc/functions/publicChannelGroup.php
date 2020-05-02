@@ -49,18 +49,11 @@ class publicChannelGroup{
                     foreach(array_keys($data[$lastChannel]) as $newUser){
                         
                         if(array_key_exists($newUser, $allUsers)){  
-                            $channelClient = $ts->channelGroupClientList($lastChannel, null, $config['channelAdminGroup'])['data'];
-                            if(isset($channelClient) && !empty($channelClient)){
-                                foreach($channelClient as $cl){
-                                    $all[] = $cl['cldbid'];
-                                }
-                                if(!in_array($newUser, $all)){
-                                    $ts->setClientChannelGroup($config['channelAdminGroup'], $lastChannel, $newUser);
-                                    $ts->sendMessage(1, $allUsers[$newUser], $lang['msg2']);
-                                   
-                                }
-                                break;
+                            if(!$ts->channelGroupClientList($lastChannel, $newUser, $config['channelAdminGroup'])['success']){
+                                $ts->setClientChannelGroup($config['channelAdminGroup'], $lastChannel, $newUser);
+                                $ts->sendMessage(1, $allUsers[$newUser], $lang['msg2']);
                             }
+                            break;
                         }
                     }
 
